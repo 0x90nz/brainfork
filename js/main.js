@@ -39,11 +39,20 @@ function getLabelAddr(name)
     if(isNaN(addr))
         addr = labels[name] + 1;
 
+    console.log("Name: " + name + " @ " + addr);
+
     return addr;
 }
 
 function executeInstruction(line, output)
 {
+    // Ignore line
+    if(line.match(/^[A-z]+\:\s*$/))
+    {
+        ip++;
+        return true;
+    }
+
     var instruction = line.split(/ (.+)/);
     var name = instruction[0];
     var args;
@@ -65,6 +74,7 @@ function executeInstruction(line, output)
         debug.value += "Arguments: " + args.join(', ') + "\n";
 
     switch (name) {
+        case "~":
         case "j":
             ip = getLabelAddr(args[0]);
             console.log("jumping to " + args[0] + " (" + ip + ")");
@@ -80,6 +90,7 @@ function executeInstruction(line, output)
         case "<":    
             output.value += memory[getAddr(args[0])] + "\n";
             output.scrollTop = output.scrollHeight;
+            console.log(memory[getAddr(args[0])]);
             break;
 
         case "outasc":
@@ -176,10 +187,11 @@ function executeInstruction(line, output)
         case "dump":
             dumpMem(memory);
             break;
-    
+        
         default:
             console.log("What's this? " + line);
-            break;
+            debug.value += "Unknown line: " + line;
+            return false;
     }
     ip++;
     return true;
@@ -193,10 +205,16 @@ function execute(target, display)
     outText.value = ""; // clear for prev runs
 
     var program = document.getElementById(target).value;
-    var lines = program.split(/(\n|;)/);
+    var lines = program.split(/[\n|;]/);
+    console.log(lines);
 
+    memory = new Array(1024);
     for(i = 0; i < memory.length; i++)
         memory[i] = 0; // fill memory
+
+    labels = {};
+    names = {};
+    ip = 0;
 
     // build names
     lines.forEach(line => {
@@ -209,22 +227,38 @@ function execute(target, display)
         {
             lines = lines.filter(item => item != line);
         }
+        else if(line.match(/\.string \d+ \".*\"/))
+        {
+            var str = line.replace(/.string \d+ /, "").replace("\"", "");
+            var addr = parseInt(line.split(" ")[1]);
+            for(i = 0; i < str.length; i++)
+            {
+                var cc = str.charCodeAt(i);
+                memory[i+addr] = cc;
+            }
+                
+            // console.log("String: " + str + " @ " + addr);
+            lines = lines.filter(item => item != line);
+        }
+        else if(line.match(/^[A-z]+\:\s*$/))
+        {
+            labels[line.split(":")[0]] = lines.indexOf(line);
+        }
     });
 
-    // build labels
     for(i = 0; i < lines.length; i++)
     {
-        if(lines[i].match(/^[A-z]+\:\s*$/))
-        {
-            labels[lines[i].split(":")[0]] = i;
-        }
+        console.log(i + ": " + lines[i]);
     }
 
-    ip = 0;
-
     timeout = setInterval(function(){
-        if(!executeInstruction(lines[ip], outText))
-            clearTimeout(timeout);
+        var output = executeInstruction((lines[ip] == undefined ? "": lines[ip]), outText);
+        console.log("Inst executed: " + lines[ip] + " with result: " + output);
+        if(!output || lines[ip] == undefined)
+        {
+            console.log("Should stop!");
+            clearInterval(timeout);
+        }
     }, 1);
 
     // for(ip = 0; ip < lines.length;)
