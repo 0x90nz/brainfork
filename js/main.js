@@ -121,7 +121,7 @@ function executeInstruction(line, output)
             break;
 
         case "subi":
-        case "-=":
+        case "-.":
             memory[getAddr(args[0])] -= parseInt(args[1]);
             break;
 
@@ -161,7 +161,7 @@ function executeInstruction(line, output)
             }
             break;
 
-        case "ble":
+        case "blt":
         case "/<":
             if(memory[getAddr(args[0])] < memory[getAddr(args[1])])
             {
@@ -197,6 +197,37 @@ function executeInstruction(line, output)
     return true;
 }
 
+function minify(target)
+{
+    var elem = document.getElementById(target);
+    var program = elem.value;
+    var outProgram = "";
+
+    var convert = {"j":"~", "set":"=", "out":"<", "outasc":"<*", "move":"->", "add":"+",
+        "addi":"+.", "sub":"-", "subi":"-.", "bz":"/0", "bnz":"/!0", "bgt":"/>", "bgteq":"/>=",
+        "blt":"/<", "blteq":"/<=", "halt":"h"};
+
+    var names = {};
+
+    program.split("\n").forEach(line => {
+        var instruction = line.split(/ (.+)/)[0].trim();
+        var args = line.split(/ (.+)/)[1];
+
+        console.log(convert[instruction]);
+
+        if(convert[instruction] != undefined)
+            instruction = convert[instruction];
+
+        if(args == undefined)
+            args = "";
+
+        if(instruction != "")
+            outProgram += instruction + " " + args + ";";
+    });
+
+    elem.value = outProgram;
+}
+
 function execute(target, display)
 {
     console.clear();
@@ -208,7 +239,7 @@ function execute(target, display)
     var lines = program.split(/[\n|;]/);
     console.log(lines);
 
-    memory = new Array(1024);
+    memory = new Array(4096);
     for(i = 0; i < memory.length; i++)
         memory[i] = 0; // fill memory
 
@@ -229,14 +260,17 @@ function execute(target, display)
         }
         else if(line.match(/\.s \d+ \".*\"/))
         {
-            var str = line.replace(/.s \d+ /, "").replace("\"", "");
+            var str = line.replace(/.s \d+ /, "").replace(/\"/g, "");
             var addr = parseInt(line.split(" ")[1]);
-            for(i = 0; i < str.length; i++)
+            var i = 0;
+            for( ; i < str.length; i++)
             {
                 var cc = str.charCodeAt(i);
                 memory[i+addr] = cc;
             }
-                
+            
+            memory[i+addr+1] = 0;
+
             // console.log("String: " + str + " @ " + addr);
             lines = lines.filter(item => item != line);
         }

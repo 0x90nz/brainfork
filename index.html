@@ -25,9 +25,24 @@ h
 = r1, 0
 = max, 3
 
-loop:;< r1;-> [r1], r1;+. r1, 1;/<= r1, max, loop;h
+loop:;< r1;-> [r1], r1;+. r1, 1;/<= r1, max, loop;
 
-.s 3 "Wow so cool!";= 0, 3;= 1, 14;loop:;<* [0];+. 0, 1;/<= 0, 1, loop;h
+.s 3 "Wow so cool!";= 0, 3;= 1, 14;a:;<* [0];+. 0, 1;/<= 0, 1, a;
+.s 3 "Hello World!";= 0, 3;a:;<* [0];+. 0, 1;/!0 [0], a
+
+# print ascii text
+.name 0 counter
+.name 1 max
+
+= counter, 65
+= max, 90
+
+print:
+outasc counter
+addi counter, 1
+blteq counter, max, print
+
+= 0, 33;= 1, 122;a: ;<* 0;+. 0, 1;/<= 0, 1, a;
 
 -->
 
@@ -51,6 +66,7 @@ loop:;< r1;-> [r1], r1;+. r1, 1;/<= r1, max, loop;h
     <textarea name="debug" id="debugTextArea" cols="80" rows="20" style="float:right;"></textarea>
     <br>
     <button onclick="execute('programTextArea', 'outputTextArea')">Run program</button>
+    <button onclick="minify('programTextArea')">Minify Source</button>
     <br>
     <p>Output:</p>
     <textarea name="output" id="outputTextArea" cols="80" rows="10"></textarea>
