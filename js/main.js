@@ -29,7 +29,7 @@ function getAddr(name)
     if(isNaN(addr))
         addr = names[name];
 
-    console.log("returning " + addr + " for " + name);
+    // console.log("returning " + addr + " for " + name);
     return addr;
 }
 
@@ -39,7 +39,7 @@ function getLabelAddr(name)
     if(isNaN(addr))
         addr = labels[name] + 1;
 
-    console.log("Name: " + name + " @ " + addr);
+    // console.log("Name: " + name + " @ " + addr);
 
     return addr;
 }
@@ -227,9 +227,9 @@ function execute(target, display)
         {
             lines = lines.filter(item => item != line);
         }
-        else if(line.match(/\.string \d+ \".*\"/))
+        else if(line.match(/\.s \d+ \".*\"/))
         {
-            var str = line.replace(/.string \d+ /, "").replace("\"", "");
+            var str = line.replace(/.s \d+ /, "").replace("\"", "");
             var addr = parseInt(line.split(" ")[1]);
             for(i = 0; i < str.length; i++)
             {
@@ -253,7 +253,7 @@ function execute(target, display)
 
     timeout = setInterval(function(){
         var output = executeInstruction((lines[ip] == undefined ? "": lines[ip]), outText);
-        console.log("Inst executed: " + lines[ip] + " with result: " + output);
+        // console.log("Inst executed: " + lines[ip] + " with result: " + output);
         if(!output || lines[ip] == undefined)
         {
             console.log("Should stop!");
