@@ -1,0 +1,60 @@
+<!--
+# inst to from
+
+.name 512 r1
+.name 513 r2
+.name 514 r3
+.name 515 max
+
+set r1, 0
+set max, 3
+
+loop:
+out r1
+move [r1], r1
+addi r1, 1
+blteq r1, max, loop
+h
+
+# inst to from
+.name 512 r1
+.name 513 r2
+.name 514 r3
+.name 515 max
+
+= r1, 0
+= max, 3
+
+loop:;< r1;-> [r1], r1;+. r1, 1;/<= r1, max, loop;h
+
+= 3, 72;= 4, 101;= 5, 108;= 6, 108;= 7, 111;= 8, 32;
+= 9, 87;= 10, 111;= 11, 114;= 12, 108;= 13, 100
+= 0, 3;= 1, 13;loop:;<* [0];+. 0, 1;/<= 0, 1, loop;h
+-->
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>esoteric-js</title>
+    <script src="js/main.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono&display=swap');
+        textarea{
+            font-family: 'IBM Plex Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <p>Program:</p>
+    <textarea name="program" id="programTextArea" cols="80" rows="25"></textarea>
+    <textarea name="debug" id="debugTextArea" cols="80" rows="20" style="float:right;"></textarea>
+    <br>
+    <button onclick="execute('programTextArea', 'outputTextArea')">Run program</button>
+    <br>
+    <p>Output:</p>
+    <textarea name="output" id="outputTextArea" cols="80" rows="10"></textarea>
+
+</body>
+</html>
