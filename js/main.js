@@ -73,14 +73,12 @@ let instructions = {
         args: 1
     },
     aliases: {
-        's': 'set',
-        'o': 'out',
-        'm': 'mov',
-        'a': 'add',
-        'u': 'sub',
-        'l': 'loop',
-        'i': 'inc',
-        'd': 'dec'
+        '=': 'set',
+        '.': 'out',
+        '[': 'loop',
+        '+': 'inc',
+        '-': 'dec',
+        ']': 'until'
     }
 };
 
