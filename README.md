@@ -8,6 +8,8 @@ Do you need all of the convenience and readability of [_that_](https://en.wikipe
 
 Then **brainfork** is for you!
 
+Try it [here](https://0x90nz.github.io/brainfork)
+
 ## Instructions
 Brainfork is somewhat compatible with [_that_](https://en.wikipedia.org/wiki/Brainfuck) language (see [Word Size](#word-size)) but also provides some other features.
 
