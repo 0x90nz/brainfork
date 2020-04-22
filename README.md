@@ -64,6 +64,19 @@ Each of the instructions that are talked about so far are actually just aliases 
 | `pinc`   | `>` | 0 | Increment the pointer                       |
 | `pdec`   | `<` | 0 | Decrement the pointer                       |
 
+### Memory References
+When an instruction takes a memory address as its argument, it is resolved down a pointer chain. Pointers are denoted by square brackets, for example: `[0]` used in the context of an instruction such as `out` (e.g. `out [0]`) would actually provide the memory pointed to by address 0 to the instruction.
+Example:
+
+```
+set 0, 40
+set [0], 0x41
+
+out [0]
+out 40
+```
+
+In this case, we set the memory at location 0 to the value 40. We then set the memory pointed to by location 0 (so memory location 40) to 0x41. From there, we output the value at the location pointed to by 0 (so location 40), and then the value at location 40 itself. You should notice that these two values are the same.
 
 ## Machine State
 The brainfork machine state is quite minimal. It has 512 "words" of memory, with each "word" being a JavaScript `Number`. It also has an instruction pointer, which simply points to which line is to be processed, and a general purpose pointer.
