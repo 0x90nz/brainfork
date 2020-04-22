@@ -105,7 +105,7 @@ function executeInstruction(line, state) {
     if(instruction.length > 1)
         args = instruction[1].split(',');
 
-    if(args != undefined) {
+    if(args !== undefined) {
         for(j = 0; j < args.length; j++)
             args[j] = args[j].trim();
     }        
@@ -117,8 +117,12 @@ function executeInstruction(line, state) {
         instructions[name];
 
     // Add implied arguments
-    if(args === undefined && operation.args === 1) {
-        args = [state.pointer.toString()];
+    if(args === undefined) {
+        args = [];
+    }
+
+    if(args.length === operation.args - 1) {
+        args = [state.pointer.toString(), ...args];
     }
 
     // Output debug info
@@ -130,9 +134,8 @@ function executeInstruction(line, state) {
         debug.innerHTML += 'Arguments: ' + args.join(', ') + '\n';
 
     if(operation !== undefined) {
-        const numArgs = args === undefined ? 0 : args.length;
-        if(numArgs !== operation.args) {
-            debug.innerHTML = 'Wrong number of arguments for ' + name + ' got ' + numArgs + ' expected ' + operation.args;
+        if(args.length !== operation.args) {
+            debug.innerHTML = 'Wrong number of arguments for ' + name + ' got ' + args.length + ' expected ' + operation.args;
         } else {
             operation.execute(args, state);
         }
@@ -143,6 +146,11 @@ function executeInstruction(line, state) {
 
     state.ip++;
     return true;
+}
+
+function minify(target) {
+    const textArea = document.getElementById(target);
+    textArea.value = textArea.value.replace(/\n/g, ';');
 }
 
 function runProgram(target, display) {
@@ -163,11 +171,30 @@ function runProgram(target, display) {
 
     const program = document.getElementById(target).value;
     let lines = program.split(/[\n|;]/);
+    let processedLines = [];
+
+    // Preprocess all the lines
+    lines.forEach((line) => {
+        const chars = line.trim().split('');
+
+        // If every character in the line is an alias
+        const pure = chars.every((c) => {
+            return instructions.aliases.hasOwnProperty(c);
+        });
+
+        if(pure) {
+            processedLines.push(...chars);
+        } else {
+            processedLines.push(line);
+        }
+    });
+
+    console.log(processedLines);
 
     timeout = setInterval(function(){
-        const output = executeInstruction((lines[state.ip] == undefined ? '': lines[state.ip]), state);
+        const output = executeInstruction((processedLines[state.ip] == undefined ? '': processedLines[state.ip]), state);
 
-        if(!output || lines[state.ip] == undefined) {
+        if(!output || processedLines[state.ip] == undefined) {
             console.log('Should stop!');
             clearInterval(timeout);
         }
