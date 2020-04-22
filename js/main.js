@@ -65,12 +65,24 @@ let instructions = {
     'until': {
         execute: (args, state) => {
             const newIp = state.loopMarkers.pop();
-            console.log(state.memory[getAddr(args[0], state.memory)]);
+            // console.log(state.memory[getAddr(args[0], state.memory)]);
             if(state.memory[getAddr(args[0], state.memory)] !== 0) {
                 state.ip = newIp - 1;
             }
         },
         args: 1
+    },
+    'pinc': {
+        execute: (args, state) => {
+            state.pointer++;
+        },
+        args: 0
+    },
+    'pdec': {
+        execute: (args, state) => {
+            state.pointer--;
+        },
+        args: 0
     },
     aliases: {
         '=': 'set',
@@ -78,7 +90,9 @@ let instructions = {
         '[': 'loop',
         '+': 'inc',
         '-': 'dec',
-        ']': 'until'
+        ']': 'until',
+        '>': 'pinc',
+        '<': 'pdec'
     }
 };
 
@@ -109,6 +123,11 @@ function executeInstruction(line, state) {
         instructions[instructions.aliases[name]] : 
         instructions[name];
 
+    // Add implied arguments
+    if(args === undefined && operation.args === 1) {
+        args = [state.pointer.toString()];
+    }
+
     if(operation !== undefined) {
         const numArgs = args === undefined ? 0 : args.length;
         if(numArgs !== operation.args) {
@@ -131,17 +150,18 @@ function runProgram(target, display) {
     let state = {
         memory: new Array(512),
         ip: 0,
+        pointer: 0,
         loopMarkers: []
     };
+
+    for(i = 0; i < state.memory.length; i++)
+        state.memory[i] = 0; // fill memory
 
     const outText = document.getElementById(display);
     outText.value = ''; // clear for prev runs
 
     const program = document.getElementById(target).value;
     let lines = program.split(/[\n|;]/);
-
-    for(i = 0; i < state.memory.length; i++)
-        state.memory[i] = 0; // fill memory
 
     timeout = setInterval(function(){
         const output = executeInstruction((lines[state.ip] == undefined ? '': lines[state.ip]), state);
