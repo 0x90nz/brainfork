@@ -25,6 +25,10 @@ div {
     grid-template-rows: 1fr 1fr;
 }
 
+.header {
+    text-align: center;
+}
+
 #editor {
     grid-column: 1;
     grid-row: 1;
@@ -60,9 +64,4 @@ button {
     border-radius: 4px;
     border: none;
     background-color: #d1d8e0;
-}
-
-h1 {
-    display: flex;
-    justify-content: center;
 }
