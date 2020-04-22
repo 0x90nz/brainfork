@@ -141,5 +141,43 @@ Here is an example of a hello world program:
 = 0x48;>;= 0x65;>;= 0x6c;>;= 0x6c;>;= 0x6f;>;= 0x20;>;= 0x57;>;= 0x6f;>;= 0x72;>;= 0x6c;>;= 0x64 ;>;= 0x21 ;>;= 0;<<<<<<<<<<<<;[.>]
 ```
 
+This program counts from 10 to 1 outputting numeric values:
+
+```
+= 0x20
+>
+= 10
+[
+  *-
+  <.>
+]
+```
+
+Minified: 
+```
+= 0x20;>;= 10;[*-<.>]
+```
+
+And here is a program which performs simple addition:
+
+```
+= 25        # Number 1
+>
+= 5         # Number 2
+
+[
+  <+       # Increment number 1
+  >-       # Decrement number 2
+]          # Continue if number 2 is not 0
+
+<          # Go back to number 1
+*          # Output the value
+```
+
+Minified:
+```
+= 25;>;= 5;[<+>-]<*
+```
+
 ## Input
 Not yet.
