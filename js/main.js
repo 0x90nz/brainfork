@@ -13,6 +13,12 @@ function rawOut(value) {
     output.scrollTop = output.scrollHeight;
 }
 
+function out(value) {
+    const output = document.getElementById('outputTextArea');
+    output.value += value;
+    output.scrollTop = output.scrollHeight;
+}
+
 let instructions = {
     'set': {
         execute: (args, state) => {
@@ -35,6 +41,12 @@ let instructions = {
     'out': {
         execute: (args, state) => {
             rawOut(state.memory[getAddr(args[0], state.memory)]);
+        },
+        args: 1
+    },
+    'outn': {
+        execute: (args, state) => {
+            out(state.memory[getAddr(args[0], state.memory)]);
         },
         args: 1
     },
@@ -88,6 +100,7 @@ let instructions = {
     aliases: {
         '=': 'set',
         '.': 'out',
+        '*': 'outn',
         '[': 'loop',
         '+': 'inc',
         '-': 'dec',
@@ -175,7 +188,8 @@ function runProgram(target, display) {
 
     // Preprocess all the lines
     lines.forEach((line) => {
-        const chars = line.trim().split('');
+        const processed = line.replace(/#.*$/m, '').trim();
+        const chars = processed.split('');
 
         // If every character in the line is an alias
         const pure = chars.every((c) => {
@@ -185,17 +199,14 @@ function runProgram(target, display) {
         if(pure) {
             processedLines.push(...chars);
         } else {
-            processedLines.push(line);
+            processedLines.push(processed);
         }
     });
-
-    console.log(processedLines);
 
     timeout = setInterval(function(){
         const output = executeInstruction((processedLines[state.ip] == undefined ? '': processedLines[state.ip]), state);
 
         if(!output || processedLines[state.ip] == undefined) {
-            console.log('Should stop!');
             clearInterval(timeout);
         }
     }, parseInt(document.getElementById('executionDelayMs').value));
