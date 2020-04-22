@@ -68,6 +68,9 @@ Each of the instructions that are talked about so far are actually just aliases 
 ## Machine State
 The brainfork machine state is quite minimal. It has 512 "words" of memory, with each "word" being a JavaScript `Number`. It also has an instruction pointer, which simply points to which line is to be processed, and a general purpose pointer.
 
+### Word Size
+It is worth noting that because of the use of `Number`, the values at any location in memory _can_ exceed 255. This will break compatibility with some code generators for [_that_](https://en.wikipedia.org/wiki/Brainfuck) language, because they expect memory locations to behave as 8bit integers. One code generator I've had luck with is [this one](https://andrew.hedges.name/experiments/brainf_cker/) from Andrew Hedges.
+
 ### The Pointer
 The pointer is used when an instruction has less arguments than it needs. For instance the `=` instruction takes two arguments, a memory location and a value. When you write `= 10`, the interpreter creates a list of arguments provided to it, in this case `[0]`. Because this is one less than the arguments needed, it adds the pointer into the arguments, resulting in `[0, 10]`. This makes it as if you had written `= 0, 10`.
 
@@ -109,3 +112,6 @@ Here is an example of a hello world program:
 ```
 = 0x48;>;= 0x65;>;= 0x6c;>;= 0x6c;>;= 0x6f;>;= 0x20;>;= 0x57;>;= 0x6f;>;= 0x72;>;= 0x6c;>;= 0x64 ;>;= 0x21 ;>;= 0;<<<<<<<<<<<<;[.>]
 ```
+
+## Input
+Not yet.
