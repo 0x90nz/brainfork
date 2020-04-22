@@ -1,11 +1,11 @@
-var labels = {};
-var names = {};
-var memory = new Array(1024);
-var ip = 0;
+let labels;
+let names;
+let memory;
+let ip = 0;
 
 function dumpMem() {
     for(i = 0; i < memory.length - 17; i += 16) {
-        var bytestring = "0x" + i.toString(16).padStart(3, "0") + ": ";
+        let bytestring = "0x" + i.toString(16).padStart(3, "0") + ": ";
         for(j = i; j < i + 16;j++) {
             bytestring += memory[i + j].toString(16).padStart(2, "0") + " ";    
         }
@@ -19,21 +19,18 @@ function getAddr(name) {
         return memory[getAddr(name.substring(1, name.length - 1))];
     }
 
-    var addr = parseInt(name);
+    let addr = parseInt(name);
 
     if(isNaN(addr))
         addr = names[name];
 
-    // console.log("returning " + addr + " for " + name);
     return addr;
 }
 
 function getLabelAddr(name) {
-    var addr = parseInt(name);
+    let addr = parseInt(name);
     if(isNaN(addr))
         addr = labels[name] + 1;
-
-    // console.log("Name: " + name + " @ " + addr);
 
     return addr;
 }
@@ -45,9 +42,9 @@ function executeInstruction(line, output) {
         return true;
     }
 
-    var instruction = line.split(/ (.+)/);
-    var name = instruction[0];
-    var args;
+    const instruction = line.split(/ (.+)/);
+    const name = instruction[0];
+    let args;
     if(instruction.length > 1)
         args = instruction[1].split(",");
 
@@ -56,13 +53,13 @@ function executeInstruction(line, output) {
             args[j] = args[j].trim();
     }
 
-    var debug = document.getElementById('debugTextArea');
+    const debug = document.getElementById('debugTextArea');
 
-    debug.value = "";
+    debug.innerHTML = "";
 
-    debug.value += "Instruction: " + name + "\n";
+    debug.innerHTML += "Instruction: " + name + "\n";
     if(args != undefined)
-        debug.value += "Arguments: " + args.join(', ') + "\n";
+        debug.innerHTML += "Arguments: " + args.join(', ') + "\n";
 
     switch (name) {
         case "~":
@@ -175,7 +172,7 @@ function executeInstruction(line, output) {
         
         default:
             console.log("What's this? " + line);
-            debug.value += "Unknown line: " + line;
+            debug.innerHTML += "Unknown line: " + line;
             return false;
     }
     ip++;
@@ -184,19 +181,19 @@ function executeInstruction(line, output) {
 
 function minify(target)
 {
-    var elem = document.getElementById(target);
-    var program = elem.value;
-    var outProgram = "";
+    const elem = document.getElementById(target);
+    const program = elem.value;
+    let outProgram = "";
 
-    var convert = {"j":"~", "set":"=", "out":"<", "outasc":"<*", "move":"->", "add":"+",
+    const convert = {"j":"~", "set":"=", "out":"<", "outasc":"<*", "move":"->", "add":"+",
         "addi":"+.", "sub":"-", "subi":"-.", "bz":"/0", "bnz":"/!0", "bgt":"/>", "bgteq":"/>=",
         "blt":"/<", "blteq":"/<=", "halt":"h"};
 
-    var names = {};
+    let names = {};
 
     program.split("\n").forEach(line => {
-        var instruction = line.split(/ (.+)/)[0].trim();
-        var args = line.split(/ (.+)/)[1];
+        const instruction = line.split(/ (.+)/)[0].trim();
+        const args = line.split(/ (.+)/)[1];
 
         console.log(convert[instruction]);
 
@@ -217,11 +214,11 @@ function execute(target, display)
 {
     console.clear();
 
-    var outText = document.getElementById(display);
+    const outText = document.getElementById(display);
     outText.value = ""; // clear for prev runs
 
-    var program = document.getElementById(target).value;
-    var lines = program.split(/[\n|;]/);
+    const program = document.getElementById(target).value;
+    let lines = program.split(/[\n|;]/);
     console.log(lines);
 
     memory = new Array(4096);
@@ -240,13 +237,11 @@ function execute(target, display)
         } else if(line.match(/^#/) || line.match(/^\s*$/)) {
             lines = lines.filter(item => item != line);
         } else if(line.match(/\.s \d+ \".*\"/)) {
-            var str = line.replace(/.s \d+ /, "").replace(/\"/g, "");
-            var addr = parseInt(line.split(" ")[1]);
-            var i = 0;
-            for( ; i < str.length; i++)
-            {
-                var cc = str.charCodeAt(i);
-                memory[i+addr] = cc;
+            const str = line.replace(/.s \d+ /, "").replace(/\"/g, "");
+            const addr = parseInt(line.split(" ")[1]);
+            let i = 0;
+            for( ; i < str.length; i++) {
+                memory[i+addr] = str.charCodeAt(i);
             }
             
             memory[i+addr+1] = 0;
@@ -258,18 +253,14 @@ function execute(target, display)
         }
     });
 
-    for(i = 0; i < lines.length; i++) {
-        console.log(i + ": " + lines[i]);
-    }
-
     timeout = setInterval(function(){
-        var output = executeInstruction((lines[ip] == undefined ? "": lines[ip]), outText);
-        // console.log("Inst executed: " + lines[ip] + " with result: " + output);
+        const output = executeInstruction((lines[ip] == undefined ? "": lines[ip]), outText);
+
         if(!output || lines[ip] == undefined) {
             console.log("Should stop!");
             clearInterval(timeout);
         }
-    }, 1);
+    }, parseInt(document.getElementById("executionDelayMs").value));
 
     console.log("done");
 }

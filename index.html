@@ -55,21 +55,75 @@ blteq counter, max, print
     <script src="js/main.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono&display=swap');
-        textarea{
+
+        * {
+            font-family: sans-serif;
+        }
+
+        div {
+            padding: 5px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+
+        #editor {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        #debug {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        #debug pre {
             font-family: 'IBM Plex Mono', monospace;
+        }
+
+        textarea {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        h1 {
+            display: flex;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
-    <p>Program:</p>
-    <textarea name="program" id="programTextArea" cols="80" rows="25"></textarea>
-    <textarea name="debug" id="debugTextArea" cols="80" rows="20" style="float:right;"></textarea>
-    <br>
-    <button onclick="execute('programTextArea', 'outputTextArea')">Run program</button>
-    <button onclick="minify('programTextArea')">Minify Source</button>
-    <br>
-    <p>Output:</p>
-    <textarea name="output" id="outputTextArea" cols="80" rows="10"></textarea>
+    <h1>esoteric-asm web interpreter</h1>
 
+    <div class="container">
+        <div id="editor">
+            <p>Program:</p>
+            <textarea name="program" id="programTextArea" cols="80" rows="25"></textarea>
+            <br />
+            <button onclick="execute('programTextArea', 'outputTextArea')">Run program</button>
+            <button onclick="minify('programTextArea')">Minify Source</button>
+            
+            <div>
+                <label>Execution Delay: </label>
+                <input type="number" id="executionDelayMs" value="1" />
+            </div>
+        </div>
+    
+        <div id="debug">
+            <p>Debug Output:</p>
+            <pre id="debugTextArea">
+        </div>
+    
+        <div>
+            <p>Output:</p>
+            <textarea name="output" id="outputTextArea" cols="80" rows="10"></textarea>
+        </div>
+    
+        <div>
+            <pre></pre>
+        </div>    
+    </div>
 </body>
 </html>
