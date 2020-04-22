@@ -1,49 +1,11 @@
 <!--
-# inst to from
-
-.name 512 r1
-.name 513 r2
-.name 514 r3
-.name 515 max
-
-set r1, 0
-set max, 3
-
-loop:
-out r1
-move [r1], r1
-addi r1, 1
-blteq r1, max, loop
-h
-
-# inst to from
-.name 512 r1
-.name 513 r2
-.name 514 r3
-.name 515 max
-
-= r1, 0
-= max, 3
-
-loop:;< r1;-> [r1], r1;+. r1, 1;/<= r1, max, loop;
-
-.s 3 "Wow so cool!";= 0, 3;= 1, 14;a:;<* [0];+. 0, 1;/<= 0, 1, a;
-.s 3 "Hello World!";= 0, 3;a:;<* [0];+. 0, 1;/!0 [0], a
-
-# print ascii text
-.name 0 counter
-.name 1 max
-
-= counter, 65
-= max, 90
-
-print:
-outasc counter
-addi counter, 1
-blteq counter, max, print
-
-= 0, 33;= 1, 122;a: ;<* 0;+. 0, 1;/<= 0, 1, a;
-
+set 0, 0x41
+loop
+out 0
+inc 0
+set 1, 0x5B
+sub 1, 0
+until 1
 -->
 
 <html lang="en">
@@ -82,6 +44,9 @@ blteq counter, max, print
 
         #debug pre {
             font-family: 'IBM Plex Mono', monospace;
+            background-color: #efefef;
+            height: 50%;
+            padding: 1em;
         }
 
         textarea {

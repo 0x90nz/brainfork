@@ -1,28 +1,10 @@
-let memory;
-let ip = 0;
-
-function dumpMem() {
-    for(i = 0; i < memory.length - 17; i += 16) {
-        let bytestring = '0x' + i.toString(16).padStart(3, '0') + ': ';
-        for(j = i; j < i + 16;j++) {
-            bytestring += memory[i + j].toString(16).padStart(2, '0') + ' ';    
-        }
-        console.log(bytestring);
-    }
-}
-
-function getAddr(name) {
+function getAddr(name, memory) {
     // deal with pointers
     if(name.match(/^\[.+\]$/)) {
-        return memory[getAddr(name.substring(1, name.length - 1))];
+        return memory[getAddr(name.substring(1, name.length - 1), memory)];
     }
 
-    let addr = parseInt(name);
-
-    if(isNaN(addr))
-        addr = names[name];
-
-    return addr;
+    return parseInt(name);
 }
 
 function rawOut(value) {
@@ -33,46 +15,62 @@ function rawOut(value) {
 
 let instructions = {
     'set': {
-        execute: (args, memory, ip) => {
-            memory[getAddr(args[0])] = parseInt(args[1]);
-        }
+        execute: (args, state) => {
+            state.memory[getAddr(args[0], state.memory)] = parseInt(args[1]);
+        },
+        args: 2
     },
     'inc': {
-        execute: (args, memory, ip) => {
-            memory[getAddr(args[0])]++;
-        }
+        execute: (args, state) => {
+            state.memory[getAddr(args[0], state.memory)]++;
+        },
+        args: 1
     },
     'dec': {
-        execute: (args, memory, ip) => {
-            memory[getAddr(args[0])]++;
-        }
+        execute: (args, state) => {
+            state.memory[getAddr(args[0], state.memory)]--;
+        },
+        args: 1
     },
     'out': {
-        execute: (args, memory, ip) => {
-            rawOut(memory[getAddr(args[0])]);
-        }
+        execute: (args, state) => {
+            rawOut(state.memory[getAddr(args[0], state.memory)]);
+        },
+        args: 1
     },
     'mov': {
-        execute: (args, memory, ip) => {
-            memory[getAddr(args[0])] = memory[getAddr(args[1])];
-        }
+        execute: (args, state) => {
+            state.memory[getAddr(args[0], state.memory)] = state.memory[getAddr(args[1], state.memory)];
+        },
+        args: 2
     },
     'add': {
-        execute: (args, memory, ip) => {
-            memory[getAddr(args[0])] += memory[getAddr(args[1])];
-        }
+        execute: (args, state) => {
+            state.memory[getAddr(args[0], state.memory)] += state.memory[getAddr(args[1], state.memory)];
+        },
+        args: 2
     },
     'sub': {
-        execute: (args, memory, ip) => {
-            memory[getAddr(args[0])] -= memory[getAddr(args[1])];
-        }
+        execute: (args, state) => {
+            state.memory[getAddr(args[0], state.memory)] -= state.memory[getAddr(args[1], state.memory)];
+        },
+        args: 2
     },
     'loop': {
-        execute: (args, memory, ip) => {
-            if(memory[getAddr(args[0])] == 0) {
-                ip = getLabelAddr(args[1]);
+        execute: (args, state) => {
+            state.loopMarkers.push(state.ip);
+        },
+        args: 0
+    },
+    'until': {
+        execute: (args, state) => {
+            const newIp = state.loopMarkers.pop();
+            console.log(state.memory[getAddr(args[0], state.memory)]);
+            if(state.memory[getAddr(args[0], state.memory)] !== 0) {
+                state.ip = newIp - 1;
             }
-        }
+        },
+        args: 1
     },
     aliases: {
         's': 'set',
@@ -86,14 +84,9 @@ let instructions = {
     }
 };
 
-function executeInstruction(line, output) {
-    // Ignore line
-    if(line.match(/^[A-z]+\:\s*$/)) {
-        ip++;
-        return true;
-    }
-
+function executeInstruction(line, state) {
     const instruction = line.split(/ (.+)/);
+
     const name = instruction[0];
     let args;
     if(instruction.length > 1)
@@ -112,55 +105,36 @@ function executeInstruction(line, output) {
     if(args != undefined)
         debug.innerHTML += 'Arguments: ' + args.join(', ') + '\n';
 
+    // Find the instruction, either from its full name, or an alias
     const operation = 
         instructions[name] === undefined ?
         instructions[instructions.aliases[name]] : 
         instructions[name];
 
     if(operation !== undefined) {
-        operation.execute(args, memory, ip);
+        const numArgs = args === undefined ? 0 : args.length;
+        if(numArgs !== operation.args) {
+            debug.innerHTML = 'Wrong number of arguments for ' + name + ' got ' + numArgs + ' expected ' + operation.args;
+        } else {
+            operation.execute(args, state);
+        }
     } else {
         debug.innerHTML = 'Undefined instruction: ' + name;
         return false;
     }
 
-    ip++;
+    state.ip++;
     return true;
 }
 
-// function minify(target)
-// {
-//     const elem = document.getElementById(target);
-//     const program = elem.value;
-//     let outProgram = '';
-
-//     const convert = {'j':'~', 'set':'=', 'out':'<', 'outasc':'<*', 'move':'->', 'add':'+',
-//         'addi':'+.', 'sub':'-', 'subi':'-.', 'bz':'/0', 'bnz':'/!0', 'bgt':'/>', 'bgteq':'/>=',
-//         'blt':'/<', 'blteq':'/<=', 'halt':'h'};
-
-//     let names = {};
-
-//     program.split('\n').forEach(line => {
-//         const instruction = line.split(/ (.+)/)[0].trim();
-//         const args = line.split(/ (.+)/)[1];
-
-//         console.log(convert[instruction]);
-
-//         if(convert[instruction] != undefined)
-//             instruction = convert[instruction];
-
-//         if(args == undefined)
-//             args = '';
-
-//         if(instruction != '')
-//             outProgram += instruction + ' ' + args + ';';
-//     });
-
-//     elem.value = outProgram;
-// }
-
 function runProgram(target, display) {
     console.clear();
+
+    let state = {
+        memory: new Array(512),
+        ip: 0,
+        loopMarkers: []
+    };
 
     const outText = document.getElementById(display);
     outText.value = ''; // clear for prev runs
@@ -168,40 +142,13 @@ function runProgram(target, display) {
     const program = document.getElementById(target).value;
     let lines = program.split(/[\n|;]/);
 
-    memory = new Array(512);
-    for(i = 0; i < memory.length; i++)
-        memory[i] = 0; // fill memory
-
-    ip = 0;
-
-    // // build names
-    // lines.forEach(line => {
-    //     if(line.match(/\.name \d+ \w+$/)) {            
-    //         names[line.split(' ')[2]] = parseInt(line.split(' ')[1]);
-    //         lines = lines.filter(item => item != line);
-    //     } else if(line.match(/^#/) || line.match(/^\s*$/)) {
-    //         lines = lines.filter(item => item != line);
-    //     } else if(line.match(/\.s \d+ \'.*\'/)) {
-    //         const str = line.replace(/.s \d+ /, '').replace(/\'/g, '');
-    //         const addr = parseInt(line.split(' ')[1]);
-    //         let i = 0;
-    //         for( ; i < str.length; i++) {
-    //             memory[i+addr] = str.charCodeAt(i);
-    //         }
-            
-    //         memory[i+addr+1] = 0;
-
-    //         // console.log('String: ' + str + ' @ ' + addr);
-    //         lines = lines.filter(item => item != line);
-    //     } else if(line.match(/^[A-z]+\:\s*$/)) {
-    //         labels[line.split(':')[0]] = lines.indexOf(line);
-    //     }
-    // });
+    for(i = 0; i < state.memory.length; i++)
+        state.memory[i] = 0; // fill memory
 
     timeout = setInterval(function(){
-        const output = executeInstruction((lines[ip] == undefined ? '': lines[ip]), outText);
+        const output = executeInstruction((lines[state.ip] == undefined ? '': lines[state.ip]), state);
 
-        if(!output || lines[ip] == undefined) {
+        if(!output || lines[state.ip] == undefined) {
             console.log('Should stop!');
             clearInterval(timeout);
         }
