@@ -78,6 +78,19 @@ out 40
 
 In this case, we set the memory at location 0 to the value 40. We then set the memory pointed to by location 0 (so memory location 40) to 0x41. From there, we output the value at the location pointed to by 0 (so location 40), and then the value at location 40 itself. You should notice that these two values are the same.
 
+Pointers may also be dereferenced multiple times:
+
+```
+set 0, 1
+set 1, 2
+
+set 2, 0x41
+
+out 2
+out [1]
+out [[0]]
+```
+
 ## Machine State
 The brainfork machine state is quite minimal. It has 512 "words" of memory, with each "word" being a JavaScript `Number`. It also has an instruction pointer, which simply points to which line is to be processed, and a general purpose pointer.
 
