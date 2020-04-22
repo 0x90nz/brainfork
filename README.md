@@ -69,6 +69,6 @@ Each of the instructions that are talked about so far are actually just aliases 
 The brainfork machine state is quite minimal. It has 512 "words" of memory, with each "word" being a JavaScript `Number`. It also has an instruction pointer, which simply points to which line is to be processed, and a general purpose pointer.
 
 ### The Pointer
-The pointer is used when an instruction has less arguments than it needs. For instance the `=` instruction takes two arguments, a memory location and a value. When you write `= 0`, the interpreter creates a list of arguments provided to it, in this case `[0]`. Because this is one less than the arguments needed, it adds the pointer into the arguments, resulting in `[0, 0]`. This makes it as if you had written `= 0, 0`.
+The pointer is used when an instruction has less arguments than it needs. For instance the `=` instruction takes two arguments, a memory location and a value. When you write `= 10`, the interpreter creates a list of arguments provided to it, in this case `[0]`. Because this is one less than the arguments needed, it adds the pointer into the arguments, resulting in `[0, 10]`. This makes it as if you had written `= 0, 10`.
 
 The pointer can be controlled with the `<` and `>` instructions.
