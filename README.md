@@ -9,7 +9,7 @@ Do you need all of the convenience and readability of [_that_](https://en.wikipe
 Then **brainfork** is for you!
 
 ## Instructions
-Brainfork is compatible with [_that_](https://en.wikipedia.org/wiki/Brainfuck) language but also provides some other features.
+Brainfork is somewhat compatible with [_that_](https://en.wikipedia.org/wiki/Brainfuck) language (see [Word Size](#word-size)) but also provides some other features.
 
 As you would expect with a language claiming compatibility, the following instructions are supported:
 
