@@ -72,3 +72,40 @@ The brainfork machine state is quite minimal. It has 512 "words" of memory, with
 The pointer is used when an instruction has less arguments than it needs. For instance the `=` instruction takes two arguments, a memory location and a value. When you write `= 10`, the interpreter creates a list of arguments provided to it, in this case `[0]`. Because this is one less than the arguments needed, it adds the pointer into the arguments, resulting in `[0, 10]`. This makes it as if you had written `= 0, 10`.
 
 The pointer can be controlled with the `<` and `>` instructions.
+
+## Example Programs
+Here is an example of a hello world program:
+
+```
+= 0x48
+>
+= 0x65
+>
+= 0x6c
+>
+= 0x6c
+>
+= 0x6f
+>
+= 0x20
+>
+= 0x57
+>
+= 0x6f
+>
+= 0x72
+>
+= 0x6c
+>
+= 0x64 
+>
+= 0x21 
+>
+= 0
+<<<<<<<<<<<<
+[.>]
+```
+ This is that same program after minification:
+```
+= 0x48;>;= 0x65;>;= 0x6c;>;= 0x6c;>;= 0x6f;>;= 0x20;>;= 0x57;>;= 0x6f;>;= 0x72;>;= 0x6c;>;= 0x64 ;>;= 0x21 ;>;= 0;<<<<<<<<<<<<;[.>]
+```
