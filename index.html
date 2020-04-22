@@ -47,51 +47,9 @@ Hello World:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>esoteric-js</title>
+    <title>Brainfork</title>
     <script src="js/main.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono&display=swap');
-
-        * {
-            font-family: sans-serif;
-        }
-
-        div {
-            padding: 5px;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-        }
-
-        #editor {
-            grid-column: 1;
-            grid-row: 1;
-        }
-
-        #debug {
-            grid-column: 2;
-            grid-row: 1;
-        }
-
-        #debug pre {
-            font-family: 'IBM Plex Mono', monospace;
-            background-color: #efefef;
-            height: 50%;
-            padding: 1em;
-        }
-
-        textarea {
-            font-family: 'IBM Plex Mono', monospace;
-        }
-
-        h1 {
-            display: flex;
-            justify-content: center;
-        }
-    </style>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <h1>A brainfork interpreter</h1>
@@ -99,15 +57,15 @@ Hello World:
     <div class="container">
         <div id="editor">
             <p>Program:</p>
-            <textarea name="program" id="programTextArea" cols="80" rows="25"></textarea>
+            <textarea name="program" id="programTextArea" rows="25"></textarea>
             <br />
             <button onclick="runProgram('programTextArea', 'outputTextArea')">Run program</button>
             <button onclick="minify('programTextArea')">Minify Source</button>
             
-            <div>
+            <span>
                 <label>Execution Delay: </label>
                 <input type="number" id="executionDelayMs" value="1" />
-            </div>
+            </span>
         </div>
     
         <div id="debug">
