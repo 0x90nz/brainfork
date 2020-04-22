@@ -67,7 +67,8 @@ let instructions = {
             const newIp = state.loopMarkers.pop();
             // console.log(state.memory[getAddr(args[0], state.memory)]);
             if(state.memory[getAddr(args[0], state.memory)] !== 0) {
-                state.ip = newIp - 1;
+                state.loopMarkers.push(newIp);
+                state.ip = newIp;
             }
         },
         args: 1
@@ -107,15 +108,7 @@ function executeInstruction(line, state) {
     if(args != undefined) {
         for(j = 0; j < args.length; j++)
             args[j] = args[j].trim();
-    }
-
-    const debug = document.getElementById('debugTextArea');
-
-    debug.innerHTML = '';
-
-    debug.innerHTML += 'Instruction: ' + name + '\n';
-    if(args != undefined)
-        debug.innerHTML += 'Arguments: ' + args.join(', ') + '\n';
+    }        
 
     // Find the instruction, either from its full name, or an alias
     const operation = 
@@ -127,6 +120,14 @@ function executeInstruction(line, state) {
     if(args === undefined && operation.args === 1) {
         args = [state.pointer.toString()];
     }
+
+    // Output debug info
+    const debug = document.getElementById('debugTextArea');
+    
+    debug.innerHTML = '';
+    debug.innerHTML += 'Instruction: ' + name + '\n';
+    if(args != undefined)
+        debug.innerHTML += 'Arguments: ' + args.join(', ') + '\n';
 
     if(operation !== undefined) {
         const numArgs = args === undefined ? 0 : args.length;
