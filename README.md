@@ -28,6 +28,7 @@ For your "convenience", these instructions are supported in addition to the base
 |Mnemonic|Action                                         |
 |-----|----------------------------------------------------|
 | `=` | Set the value at the pointer, e.g. `= 10`          |
+| `*` | Output the decimal value at the pointer            |
 
 Together, these instructions make up the compact set of instructions. For the instructions which are able to be represented as a single character, they may be combined on one line without any delimiter. If an instruction requires arguments (`=` for example) then it must either be on its own line or separated from other characters on the line with a `;` character. Below are some examples:
 
@@ -57,6 +58,7 @@ Each of the instructions that are talked about so far are actually just aliases 
 |----|-----|---------|------|
 | `set`    | `=` | 2 | Set the memory at `arg0` to value `arg1`    |
 | `out`    | `.` | 1 | Output the ASCII character at memory `arg0` |
+| `outn`   | `*` | 1 | Output the decimal value at memory `arg0`   |
 | `loop`   | `[` | 0 | Begin a loop                                |
 | `until`  | `]` | 1 | Go back to the corresponding loop while the memory at `arg0` is not 0|
 | `inc`    | `+` | 1 | Increment the memory at `arg0`              |
