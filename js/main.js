@@ -209,9 +209,7 @@ function runProgram(target, display) {
         const chars = processed.split('');
 
         // If every character in the line is an alias
-        const pure = chars.every((c) => {
-            return instructions.aliases.hasOwnProperty(c);
-        });
+        const pure = chars.every((c) => instructions.aliases.hasOwnProperty(c));
 
         if(pure) {
             processedLines.push(...chars);
