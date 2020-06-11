@@ -1,3 +1,4 @@
+// Recursively find the value at a memory address from a name
 function getAddr(name, memory) {
     // deal with pointers
     if(name.match(/^\[.+\]$/)) {
@@ -7,18 +8,27 @@ function getAddr(name, memory) {
     return parseInt(name);
 }
 
+// Output the raw value from a given char code to the text area
 function rawOut(value) {
     const output = document.getElementById('outputTextArea');
     output.value += String.fromCharCode(value);
     output.scrollTop = output.scrollHeight;
 }
 
+// Output a value to the text area
 function out(value) {
     const output = document.getElementById('outputTextArea');
     output.value += value;
     output.scrollTop = output.scrollHeight;
 }
 
+// Here's where we define all the instructions that are supported.
+// Each instruction is in the format of an object with a name of that instruction
+// Each instruction has a field 'execute' which is a function taking arguments and 
+//  state. It performs the given operation on the machines state
+// Each instruction has a field 'args' which is the number of arguments it takes
+// Aliases may also be defined for insns, these are used as the short form (i.e. 
+// 'out' is aliased with '.')
 let instructions = {
     'set': {
         execute: (args, state) => {
@@ -161,11 +171,18 @@ function executeInstruction(line, state) {
     return true;
 }
 
+// Squish all the text down by replacing newlines with semicolons
+// Note, this does not minify long-form instructions to their aliases
 function minify(target) {
     const textArea = document.getElementById(target);
     textArea.value = textArea.value.replace(/\n/g, ';');
 }
 
+
+// Run a given program. Hopefully should be obvious from the name.
+// We first define a machine, and set it's state to all zeros.
+// Then we pre-process the program removing comments and the like
+// Then we can _finally_ execute the program using a timer loop
 function runProgram(target, display) {
     console.clear();
 
@@ -203,7 +220,7 @@ function runProgram(target, display) {
         }
     });
 
-    timeout = setInterval(function(){
+    timeout = setInterval(() => {
         const output = executeInstruction((processedLines[state.ip] == undefined ? '': processedLines[state.ip]), state);
 
         if(!output || processedLines[state.ip] == undefined) {
