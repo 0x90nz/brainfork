@@ -218,7 +218,7 @@ function runProgram(target, display) {
         }
     });
 
-    timeout = setInterval(() => {
+    const timeout = setInterval(() => {
         const output = executeInstruction((processedLines[state.ip] == undefined ? '': processedLines[state.ip]), state);
 
         if(!output || processedLines[state.ip] == undefined) {
